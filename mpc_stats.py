@@ -20,15 +20,15 @@ def main():
     config.read('config')
     user_token = config['discogs']['user_token']
     d = discogs_client.Client('mpc_stats/0.1', user_token=user_token)
-    
-    os.system("mpc list albumartist > albumartist.txt")
-    with open("albumartist.txt", "r") as f:
+
+    os.system("mpc list albumartist > albumartist.csv")
+    with open("albumartist.csv", "r") as f:
         list_artists = [line.strip() for line in f if line.strip()]
     for artist in list_artists:
         artist = artist.rstrip()
         logger.debug(f"Querying albums for artist : {artist}")
         artist_filename = artist.replace("/", "-")
-        filename = f"output/{artist_filename}.txt"
+        filename = f"output/{artist_filename}.csv"
         if not os.path.exists(os.path.dirname(filename)):
             try:
                 logger.debug(f"création du chemin pour {filename}")
@@ -38,9 +38,9 @@ def main():
                     raise
         os.system(f"mpc list album albumartist \"{artist}\" > \"{filename}\"")
     directory = "output"
-    pathlist = Path(directory).glob('**/*.txt')
+    pathlist = Path(directory).glob('**/*.csv')
     pathlist_size = sum(1 for x in pathlist)
-    pathlist = Path(directory).glob('**/*.txt')
+    pathlist = Path(directory).glob('**/*.csv')
     collection = []
     collection.append(
             [
@@ -104,7 +104,7 @@ def search_discogs(d, artist, album):
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Extract unique images from videos')
+    parser = argparse.ArgumentParser(description='Get informations about your mpd local server using mpc')
     parser.add_argument('--debug', help="Display debugging information", action="store_const", dest="loglevel", const=logging.DEBUG, default=logging.INFO)
     args = parser.parse_args()
     logging.basicConfig(level=args.loglevel)
